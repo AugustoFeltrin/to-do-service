@@ -1,11 +1,3 @@
-package com.example.todo.service;
-
-import com.example.todo.model.Task;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 public class TaskService {
     private final List<Task> tasks = new ArrayList<>();
@@ -16,21 +8,32 @@ public class TaskService {
     }
 
     public Task addTask(Task task) {
+        // Validação de entrada
+        if (task.getId() != null) {
+            throw new IllegalArgumentException("O ID da tarefa deve ser nulo ao adicionar uma nova tarefa.");
+        }
+
         task.setId(nextId++);
         tasks.add(task);
         return task;
     }
 
     public Task editTask(Long taskId, Task updatedTask) {
-        // Implement the logic to edit a task by its ID
+        // Validação de entrada
+        if (updatedTask.getId() == null) {
+            throw new IllegalArgumentException("O ID da tarefa deve ser fornecido ao editar uma tarefa.");
+        }
+
         for (Task task : tasks) {
             if (task.getId().equals(taskId)) {
-                // Update the task details
-                // You may need to implement the update logic here
+                // Atualize os detalhes da tarefa
+                task.setDescription(updatedTask.getDescription());
+                task.setDueDate(updatedTask.getDueDate());
+                task.setCompleted(updatedTask.isCompleted());
                 return task;
             }
         }
-        return null; // Task not found
+        throw new TaskNotFoundException("Tarefa não encontrada com o ID: " + taskId);
     }
 
     public void deleteTask(Long taskId) {
